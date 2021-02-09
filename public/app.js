@@ -15,23 +15,13 @@ const video = document.querySelector('#video');
 const canvas = document.querySelector('#canvas');
 const targetText = document.querySelector('#target');
 targetText.style.opacity = "0%";
-let isCallingMotor = false;
 const context = canvas.getContext('2d');
 let model;
 
+// Local copy of the event list and uptime
+let events = [];
+let uptime = 0;
 const $uptime = $('#uptime');
-
-handTrack.startVideo(video)
-	.then(status => {
-		if(status){
-			navigator.getUserMedia({video: {}}, stream => {
-				video.srcObject = stream;
-				setInterval(runDetection, 100);
-			},
-			err => console.log(err)
-			);
-		}
-	});
 
 /************ */
 function runDetection(){
@@ -46,7 +36,7 @@ function runDetection(){
 			var output = {
 				gpio: 27,
 				state: 0,
-				time: Number.parseInt($uptime.text())+1,
+				time: Number.parseInt($uptime.text()),
 			};
 			console.log("x: " + x);
 			console.log("y: " + y);
@@ -64,21 +54,50 @@ function runDetection(){
 			if(x >= 200 && x <= 300){
 				if(y >= 100 && y <= 200){
 					targetText.style.opacity = "100%";
-					if(output.state == 1) {
+					if(output.state === 1) {
 						output.state = 0;
-						// addMotorEvent(output);
-						// return;
+						// check if there is any event with the current uptime/unique value of the 'time' property
+						// if yes, do nothing
+						// if no, add the new event
 					}
 				}
 			} else {
 				targetText.style.opacity = "0%";
-				if(output.state == 0) {
+				if(output.state === 0) {
 					output.state = 1;
-					// addMotorEvent(output);
-					// return;
 				}
 			}
-			console.log(output.state);
+			let eventTimeArr = events.map(event => { return event.time; });
+			// some() method tests whether at least one element in the array passes the test
+			// let isEventDuplicate = eventTimeArr.some((item, idx) => {
+			// 	return eventTimeArr.indexOf(item) !== idx;
+			// });
+
+			let isEventExist = eventTimeArr.some(item => {
+				return item === output.time;
+			});
+
+			if (!isEventExist) addMotorEvent(output);
+
+				// events.forEach(event => {
+				// 	if(event.time < uptime){
+				// 		deleteEvent(event.id);
+					// events.splice(0, 1);
+				// });
+				// setTimeout(() => {
+				// 	events.forEach(event => {
+				// 		if(event.time < uptime){
+				// 			deleteEvent(event.id);
+				// 		}
+				// 		// events.splice(0, 1);
+				// 	});
+				// }, 1000); // myArray.splice(start, deleteCount)
+			// }
+
+
+			console.log(`Uptime: ${uptime}s, output.Time: ${output.time}s, state: ${output.state}`);
+			// console.log(events);
+			console.log(eventTimeArr);
 		}
 	});
 }
@@ -86,6 +105,10 @@ function runDetection(){
 handTrack.load(modelParams).then(lmodel => {
 	model = lmodel;
 	});
+
+function checkUniqueEventTime(event) {
+	return event.time
+}
 ///////////////////////////// REST-API GPIO Control /////////////////////////////
 /***
 	httpPie bash commands for check out:
@@ -94,9 +117,9 @@ handTrack.load(modelParams).then(lmodel => {
 		- http POST https://192.168.0.103/api/events gpio=2 state=1 time=100 --verify no
 		- http DELETE https://192.168.0.103/api/events/0 --verify no
 ***/
-// Local copy of the event list and uptime
-let events = [];
-let uptime = 0;
+// // Local copy of the event list and uptime
+// let events = [];
+// let uptime = 0;
 
 // This function synchronizes the uptime every 10s
 function updateUptime() {
@@ -238,11 +261,34 @@ function updateTable() {
   ));
 }
 
+function deleteOlderRequest() {
+	setInterval(() => {
+		events.forEach(event => {
+			if (event.time < uptime){
+				deleteEvent(event.id);
+			}
+		  });
+	  }, 1000);
+}
+
 // When the page is ready...
 $(document).ready(() => {
   // Initially update uptime:
   updateUptime();
 
+  handTrack.startVideo(video)
+	.then(status => {
+		if(status){
+			navigator.getUserMedia({video: {}}, stream => {
+				video.srcObject = stream;
+				setInterval(runDetection, 100);
+			},
+			err => console.log(err)
+			);
+		}
+	});
+
   // Initially poll the events
   updateEventlist();
+  deleteOlderRequest();
 });
