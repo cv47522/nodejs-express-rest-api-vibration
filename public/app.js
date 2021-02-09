@@ -11,7 +11,7 @@ navigator.getUserMedia = navigator.getUserMedia ||
                          navigator.mozGetUserMedia;
 
 //Select everything in my html
-const video = document.querySelector('#video');
+const video = document.querySelector('#webcam-video');
 const canvas = document.querySelector('#canvas');
 const targetText = document.querySelector('#target');
 targetText.style.opacity = "0%";
@@ -36,7 +36,7 @@ function runDetection(){
 			var output = {
 				gpio: 27,
 				state: 0,
-				time: Number.parseInt($uptime.text()),
+				time: Number.parseInt($uptime.text()) + 1,
 			};
 			console.log("x: " + x);
 			console.log("y: " + y);
@@ -257,7 +257,7 @@ function updateTable() {
   // Rewrite table
   sortedEvents.forEach(ev => $('#tbody').append(
 	'<tr><td>'+ev.time+'</td><td>GPIO'+ev.gpio+'</td><td>'+(ev.state===1?'HIGH':'LOW')+'</td>' +
-	'<td><button type=\"button\" onClick=\"deleteEvent('+ev.id+');\">Delete</button></td></tr>'
+	'<td><button type=\"button\" class=\"btn- btn-primary\" onClick=\"deleteEvent('+ev.id+');\">Delete</button></td></tr>'
   ));
 }
 
