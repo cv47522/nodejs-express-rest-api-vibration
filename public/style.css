@@ -34,43 +34,46 @@ input {
 overflow: hidden;
 background-color: #143642;
 }
+
 .content {
 	padding: 30px;
 	max-width: 600px;
 	margin: 0 auto;
 }
 .card {
-background-color: #F8F7F9;;
-box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5);
-padding-top:10px;
-padding-bottom:20px;
+	background-color: #F8F7F9;;
+	box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5);
+	padding-top:10px;
+	padding-bottom:20px;
 }
-/* .button {
-padding: 15px 50px;
-font-size: 24px;
-text-align: center;
-outline: none;
-color: #fff;
-background-color: #0f8b8d;
-border: none;
-border-radius: 5px;
--webkit-touch-callout: none;
--webkit-user-select: none;
--khtml-user-select: none;
--moz-user-select: none;
--ms-user-select: none;
-user-select: none;
--webkit-tap-highlight-color: rgba(0,0,0,0);
+.button {
+	padding: 10px 15px;
+	font-size: 12px;
+	text-align: center;
+	outline: none;
+	color: #fff;
+	background-color: #0f8b8d;
+	border: none;
+	border-radius: 5px;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	-webkit-tap-highlight-color: rgba(0,0,0,0);
 }
+
 .button:active {
-background-color: #0f8b8d;
-box-shadow: 2 2px #CDCDCD;
-transform: translateY(2px);
-} */
+	background-color: #0f8b8d;
+	box-shadow: 2 2px #CDCDCD;
+	transform: translateY(2px);
+}
+
 .state {
-font-size: 1.5rem;
-color:#8c8c8c;
-font-weight: bold;
+	font-size: 1.5rem;
+	color:#8c8c8c;
+	font-weight: bold;
 }
 
 
@@ -80,30 +83,20 @@ font-weight: bold;
 /* Style the Full Screen video: 100% width and height to cover the entire window */
 #webcam-video{
 	min-width: 100%;
-	min-height: 50vh;
+	min-height: 80vh;
 	object-fit: cover;
 	-webkit-transform: scaleX(-1);
 	transform: scaleX(-1);
 }
 
-*{
-	margin: 0;
-	padding: 0;
-	box-sizing: border-box;
-}
-
-/* .notes{
-	position: absolute;
+.row {
+	display: flex;
 	width: 100%;
-	bottom: 250px;
 }
-
-.notes h3{
-	opacity: 100%;
-	text-align: center;
-	font-size: 50px;
-	color: red;
-} */
+.col {
+	flex: 1;
+	padding: 16px;
+}
 
 .video-container {
 	position: relative;
@@ -128,6 +121,13 @@ font-weight: bold;
 }
 
 .video-container .overlay .text-container h3{
+	font-size: 1.5em;
 	color:#FFF;
-	padding: 2.5em 2em;
+	padding: 3.5em 2em;
+}
+
+
+/*************/
+.m-5 {
+	margin: 1em;
 }
