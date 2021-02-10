@@ -3,37 +3,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>esp32_https_server - REST API Demo</title>
+  <title>ESP32 Handtracking HTTPS Server - REST API Demo</title>
   <link rel="icon" href="data:,">
-  <link href="bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+  <!-- <link href="bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous"> -->
   <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
-
-    <h1>esp32_https_server - REST API Demo</h1>
+    <h1>ESP32 Handtracking HTTPS Server - REST API Demo</h1>
     <p><strong>Current system time:</strong> <span id="uptime">loading...</span></p>
-
-    <!-- <video id="webcam-video"></video>
-		<div class="notes">
-			<h3 id="target">Target</h3>
-    </div> -->
 
   <div class="video-container">
     <div class="overlay">
         <div class="text-container">
           <div class="row">
             <h3 class="col">1</h3>
-            <h3 class="col">2</h3>
+            <h3 class="col" id="top">Top/26</h3>
             <h3 class="col">3</h3>
           </div>
           <div class="row">
-            <h3 class="col">4</h3>
+            <h3 class="col" id="left">Left/22</h3>
             <h3 class="col" id="target">Target</h3>
-            <h3 class="col">6</h3>
+            <h3 class="col" id="right">Right/23</h3>
           </div>
           <div class="row">
             <h3 class="col">7</h3>
-            <h3 class="col">8</h3>
+            <h3 class="col" id="bottom">Bottom/27</h3>
             <h3 class="col">9</h3>
           </div>
         </div>
@@ -41,78 +35,85 @@
     <video id="webcam-video"></video>
   </div>
 
-  <div class="container">
-    <div class="row">
-      <h2>Current Events</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Time</th>
-            <th>GPIO</th>
-            <th>New State</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody id="tbody">
-        </tbody>
-      </table>
-    </div>
-    <div class="row">
-      <h2>Add a New Event</h2>
-    <form onsubmit="addEvent(); return false;">
-      <table>
-        <thead>
-          <tr>
-            <th>Time</th>
-            <th>GPIO</th>
-            <th>State</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody id="tbody">
-          <tr>
-            <td><input id="evTime" /> sec</td>
-            <td>
-              <select id="evGPIO">
-                <option value="2">GPIO2</option>
-                <option value="26">GPIO26</option>
-                <option value="27">GPIO27</option>
-                <option value="32">GPIO32</option>
-                <option value="33">GPIO33</option>
-              </select>
-            </td>
-            <td>
-              <input type="checkbox" id="evState" /> HIGH
-            </td>
-            <td><button type="button" class="btn btn-primary" onclick="addEvent(); return false;">Add</button></td>
-          </tr>
-        </tbody>
-      </table>
-    </form>
-    </div>
+  <div>
+    <h2>Current Events</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>GPIO</th>
+          <th>New State</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="tbody">
+      </tbody>
+    </table>
+  </div>
+  <div>
+    <h2>Add a New Event</h2>
+  <form onsubmit="addEvent(); return false;">
+    <table>
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>GPIO</th>
+          <th>State</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="tbody">
+        <tr>
+          <td><input id="evTime" /> sec</td>
+          <td>
+            <select id="evGPIO">
+              <option value="22">GPIO22</option>
+              <option value="23">GPIO23</option>
+              <option value="25">GPIO25</option>
+              <option value="26">GPIO26</option>
+              <option value="27">GPIO27</option>
+            </select>
+          </td>
+          <td>
+            <input type="checkbox" id="evState" /> HIGH
+          </td>
+          <td><button type="button" class="button" onclick="addEvent(); return false;">Add</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </form>
   </div>
 
-  <div class="row pt-2">
+
+  <div>
     <canvas id="canvas"></canvas>
   </div>
 
-  <div class="row">
-    <h2>About This Example</h2>
-    <p>This example shows you a web-page that can be used to control GPIOs 25, 26, 27, 32 and 33 to be turned on or off at a given time.</p>
+  <div>
+    <h2>About This Demo</h2>
+    <p>This demoo shows you a web-page that can be used to control GPIOs 22, 23, 25, 26 and 27 to be turned on or off at a given time.</p>
     <p>For simplicity, we use the system uptime here, which you can see at the top of the page.</p>
     <p>The page uses the REST API provided at /api to commuicate with the ESP32.</p>
-    <p><strong>GET /api/uptime</strong> returns the current system uptime:</p>
-    <pre>{"uptime":42}</pre>
-    <p>This node is polled every 10 seconds to stay synchronized.</p>
-    <p><strong>GET /api/events</strong> returns the current list of events:</p>
-    <pre>[{"gpio":27,"state":1,"time":42,"id":0}, ...]</pre>
-    <p>This node is polled every 60 seconds to stay synchronized</p>
-    <p><strong>POST /api/events</strong> can be used to add new events. The response object will contain an additional id that can be used to refer to the event.</p>
-    <p><strong>DELETE /api/events/<em>id</em></strong> will delete the event with the specified id. If events are executed (time &lt; uptime), they are deleted as well.</p>
-    <p>The client side javascript synchronizes your view even if not explicit request is sent to the ESP32.</p>
+    <div class="m-5">
+      <p><strong>GET /api/uptime</strong> returns the current system uptime:</p>
+      <pre>{"uptime":42}</pre>
+      <p>This node is polled every 10 seconds to stay synchronized.</p>
+    </div>
+    <div class="m-5">
+      <p><strong>GET /api/events</strong> returns the current list of events:</p>
+      <pre>[{"gpio":27,"state":1,"time":42,"id":0}, ...]</pre>
+      <p>This node is polled every 60 seconds to stay synchronized</p>
+    </div>
+    <div class="m-5">
+      <p><strong>POST /api/events</strong> can be used to add new events. The response object will contain an additional id that can be used to refer to the event.</p>
+    </div>
+    <div class="m-5">
+      <p><strong>DELETE /api/events/<em>id</em></strong> will delete the event with the specified id. If events are executed (time &lt; uptime), they are deleted as well.</p>
+      <p>The client side javascript synchronizes your view even if not explicit request is sent to the ESP32.</p>
+    </div>
   </div>
 
-  <script src="bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+  <!-- <script src="bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script> -->
   <script src="jquery-3.3.1.min.js"></script>
   <script src="handtrack.min.js"></script>
   <script src="app.js"></script>
