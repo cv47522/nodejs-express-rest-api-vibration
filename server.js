@@ -24,6 +24,15 @@ setInterval(() => {
 
 const events = [];
 
+/***
+	httpPie bash commands for check out:
+		- http https://localhost:3000/api/uptime --verify no
+		- http http://localhost:3000/api/courses --verify no
+        - http POST http://localhost:3000/api/courses name="hello"
+		- http http://localhost:3000/api/events --verify no
+		- http POST http://localhost:3000/api/events gpio=2 state=1 time=100 --verify no
+		- http DELETE http://localhost:3000/api/events/0 --verify no
+***/
 app.get('/', (req, res) => {
     res.send('Hello World!')
 });
@@ -47,7 +56,8 @@ app.post('/api/events', (req, res) => {
     const event = {
         id: events.length,
         gpio: req.body.gpio,
-        state: req.body.state,
+        // digitalState: req.body.digitalState,
+        state: req.body.state, // analog state
         time: req.body.time
     };
     events.push(event);
@@ -155,7 +165,8 @@ function validateCourse(course) {
 function validateEvents(event) {
     const schema = Joi.object({
         gpio: Joi.number().integer().required(),
-        state: Joi.number().integer().valid(0, 1).required(),
+        // digitalState: Joi.number().integer().valid(0, 1).required(),
+        state: Joi.number().integer().required(), // analog
         time: Joi.number().integer().required()
     });
 

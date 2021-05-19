@@ -1,21 +1,29 @@
 //Select everything in my html
-const video = document.querySelector('#webcam-video');
-const canvas = document.querySelector('#canvas');
-const targetText = document.querySelector('#target');
-targetText.style.opacity = "0%";
-const context = canvas.getContext('2d');
-let model;
+// const targetText = document.querySelector('#target');
+// targetText.style.opacity = "0%";
 
 // Local copy of the event list and uptime
 let events = [];
 let uptime = 0;
 const $uptime = $('#uptime');
-// let isDirection = [false, false, false, false, false]; // Center, Left, Right, Top, Bottom
 let isCenter = false;
 
 // Motor GPIO
-const LEFT = 22, RIGHT = 23, TOP = 26, BOTTOM = 27, LED = 25;
-const motorGpioArr = [LEFT, RIGHT, TOP, BOTTOM];
+// const LEFT = 22, RIGHT = 23, TOP = 26, BOTTOM = 27, LED = 25;
+// const motorGpioArr = [LEFT, RIGHT, TOP, BOTTOM];
+const motorsDictLeft = {
+	'THUMB1': 19, 'POINTER1': 26, 'MIDDLE1': 27, 'RING1': 14, 'LITTLE1': 23,
+	'THUMB2': 5, 'POINTER2': 13, 'MIDDLE2': 33, 'RING2': 12, 'LITTLE2': 22,
+	'UPPALM1': 4, 'DOWNPALM1': 18, 'DOWNPALM2': 17, 'UPPALM2': 16, 'DOWNPALM3': 21,
+	'BACK1': 15, 'BACK2': 25, 'BACK3': 32,
+}
+
+const motorsDictRight = {
+	'THUMB1': 23, 'POINTER1': 12, 'MIDDLE1': 33, 'RING1': 13, 'LITTLE1': 19,
+	'THUMB2': 22, 'POINTER2': 14, 'MIDDLE2': 27, 'RING2': 26, 'LITTLE2': 5,
+	'DOWNPALM1': 21, 'DOWNPALM2': 18, 'UPPALM1': 4, 'UPPALM2': 32, 'DOWNPALM3': 17,
+	'BACK1': 16, 'BACK2': 15, 'BACK3': 25,
+}
 
 const modelParams = {
   flipHorizontal: false,   // flip e.g for video
@@ -33,27 +41,6 @@ $(document).ready(() => {
 
 	// Initially poll the events
 	updateEventlist();
-
-	navigator.getUserMedia = navigator.getUserMedia ||
-                         navigator.webkitGetUserMedia ||
-                         navigator.mozGetUserMedia;
-
-	handTrack.load(modelParams).then(lmodel => {
-		model = lmodel;
-	});
-
-	handTrack.startVideo(video)
-		.then(status => {
-			if(status){
-				navigator.getUserMedia({video: {}}, stream => {
-					video.srcObject = stream;
-					setInterval(runDetection, 100);
-				},
-				err => console.log(err)
-				);
-			}
-	});
-
 	deleteOlderRequest();
 });
 
@@ -81,141 +68,37 @@ function turnOnPin(pin) {
 	// if (outputs.length === 0) {
 		outputs.push({
 			gpio: pin,
-			state: 1,
+			// state: 1, // digital
+			state: 150, // analog
 			time: Number.parseInt($uptime.text()) + 1
 		})
 	// }
 }
 
 function turnOffMotors() {
-	// if (outputs.length === 0) {
-		for(let i=0; i<motorGpioArr.length; i++) {
-			outputs.push({
-				gpio: motorGpioArr[i],
-				state: 0,
-				time: Number.parseInt($uptime.text())
-			})
-		}
-	// }
+	for(let key in motorsDictLeft) {
+		outputs.push({
+			gpio: motorsDictLeft[key],
+			state: 0,
+			time: Number.parseInt($uptime.text())
+		})
+	}
+
+	for(let key in motorsDictRight) {
+		outputs.push({
+			gpio: motorsDictRight[key],
+			state: 0,
+			time: Number.parseInt($uptime.text())
+		})
+	}
 }
-/************ */
-function runDetection(){
-	model.detect(video).then(predictions => {
-		// console.log(predictions); // Array[]: empty array
-
-		model.renderPredictions(predictions, canvas, context, video);
-		if(predictions.length > 0){
-			let hand1 = predictions[0].bbox;
-			let x = hand1[0];
-			let y = hand1[1];
-
-			// let outputs = [];
-
-			console.log("x: " + x);
-			console.log("y: " + y);
-
-			// if(x >= 200 && x <= 300){
-			// 	if(y >= 100 && y <= 200){
-			// 		targetText.style.opacity = "100%";
-			// 		if(output.state === 1) {
-			// 			output.state = 0;
-			// 			// check if there is any event with the current uptime/unique value of the 'time' property
-			// 			// if yes, do nothing
-			// 			// if no, add the new event
-			// 		}
-			// 	}
-			// } else {
-			// 	targetText.style.opacity = "0%";
-			// 	if(output.state === 0) {
-			// 		output.state = 1;
-			// 	}
-			// }
-				if (y >= 100 && y <= 200) {
-					if (x < 200) {   // Right
-						targetText.style.opacity = "0%";
-						turnOffMotors();
-						turnOnPin(RIGHT);
-					} else if (x >= 200 && x <= 300) { // Center
-						targetText.style.opacity = "100%";
-						turnOffMotors();
-					} else {  // Left
-						targetText.style.opacity = "0%";
-						turnOffMotors();
-						turnOnPin(LEFT);
-					}
-				} else if (x >= 200 && x <= 300 && y < 100) {
-						targetText.style.opacity = "0%";
-						turnOffMotors();
-						turnOnPin(TOP);
-				} else if (x >= 200 && x <= 300 && y > 200) {
-					targetText.style.opacity = "0%";
-					turnOffMotors();
-					turnOnPin(BOTTOM);
-				} else {
-					turnOffMotors();
-				}
-
-			// let eventTimeArr = events.map(event => { return event.time; });
-			// some() method tests whether at least one element in the array passes the test
-			// let isEventDuplicate = eventTimeArr.some((item, idx) => {
-			// 	return eventTimeArr.indexOf(item) !== idx;
-			// });
-
-			// let isEventExist = eventTimeArr.some(item => {
-			// 	return item === Number.parseInt($uptime.text());
-			// });
-
-
-			outputs.forEach(e => {
-				if (isStateChanged(e)) addMotorEvent(e);
-			});
-			outputs = [];
-			// deleteOlderRequest();
-
-			// if (!isEventExist) {
-			// 	outputs.forEach(out => { addMotorEvent(out); });
-			// 	// addMotorEvent(output);
-			// }
-				// events.forEach(event => {
-				// 	if(event.time < uptime){
-				// 		deleteEvent(event.id);
-					// events.splice(0, 1);
-				// });
-			// }
-
-
-			// console.log(`Uptime: ${uptime}s, output.Time: ${output.time}s, state: ${output.state}`);
-			console.log(`Uptime: ${uptime}s`);
-			console.log('Outputs:');
-			console.log(outputs);
-			console.log('Events:');
-			console.log(events);
-		}
-	});
-}
-
-// function turnOnOffMotors(arr, exclude = null) {
-// 	for (let i = 0; i < motorGpioArr.length; i++) {
-// 		arr.push({
-// 			gpio: motorGpioArr[i],
-// 			state: 0,
-// 			time: Number.parseInt($uptime.text())
-// 		});
-// 	}
-// 	if (exclude != null) {
-// 		arr.push({
-// 			gpio: exclude,
-// 				state: 1,
-// 				time: Number.parseInt($uptime.text()) + 1
-// 		});
-// 	}
-// }
 ///////////////////////////// REST-API GPIO Control /////////////////////////////
 /***
 	httpPie bash commands for check out:
 		- http https://192.168.0.103/api/uptime --verify no
+		- http http://localhost:3000/api/courses --verify no
 		- http https://192.168.0.103/api/events --verify no
-		- http POST https://192.168.0.103/api/events gpio=2 state=1 time=100 --verify no
+		- http POST https://10.100.5.78/api/events gpio=23 state=100 time=120 --verify no
 		- http DELETE https://192.168.0.103/api/events/0 --verify no
 ***/
 // This function synchronizes the uptime every 10s
@@ -269,7 +152,8 @@ function updateEventlist() {
 function addEvent() {
 	let event = {
 		gpio: Number.parseInt($('#evGPIO').val()),
-		state: $('#evState').is(':checked') ? 1 : 0,
+		// digitalState: $('#evDigitalState').is(':checked') ? 1 : 0,
+		state: Number.parseInt($('#evAnalogState').val()), // analog
 		time: Number.parseInt($('#evTime').val()),
 	};
 
@@ -360,8 +244,9 @@ function updateTable() {
   $('#tbody').html("");
   // Rewrite table
   sortedEvents.forEach(ev => $('#tbody').append(
-	'<tr><td>'+ev.time+'</td><td>GPIO'+ev.gpio+'</td><td>'+(ev.state===1?'HIGH':'LOW')+'</td>' +
+	'<tr><td>'+ev.time+'</td><td>'+$('#evGPIO').find(":selected").text()+': IO'+ev.gpio +'</td><td>'+ev.state+'</td>' + // analog state
 	'<td><button type=\"button\" class=\"button\" onClick=\"deleteEvent('+ev.id+');\">Delete</button></td></tr>'
+	// '</td><td>'+(ev.digitalState===1?'HIGH':'LOW') +
   ));
 }
 
