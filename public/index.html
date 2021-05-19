@@ -3,37 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ESP32 Handtracking HTTPS Server - REST API Demo</title>
+  <title>ESP32 Haptic Glove HTTPS Server - REST API Demo</title>
   <link rel="icon" href="data:,">
   <!-- <link href="bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous"> -->
   <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
-    <h1>ESP32 Handtracking HTTPS Server - REST API Demo</h1>
+    <h1>ESP32 Haptic Glove HTTPS Server - REST API Demo</h1>
     <p><strong>Current system time:</strong> <span id="uptime">loading...</span></p>
-
-  <div class="video-container">
-    <div class="overlay">
-        <div class="text-container">
-          <div class="row">
-            <h3 class="col">1</h3>
-            <h3 class="col" id="top">Top/26</h3>
-            <h3 class="col">3</h3>
-          </div>
-          <div class="row">
-            <h3 class="col" id="left">Left/22</h3>
-            <h3 class="col" id="target">Target</h3>
-            <h3 class="col" id="right">Right/23</h3>
-          </div>
-          <div class="row">
-            <h3 class="col">7</h3>
-            <h3 class="col" id="bottom">Bottom/27</h3>
-            <h3 class="col">9</h3>
-          </div>
-        </div>
-    </div>
-    <video id="webcam-video"></video>
-  </div>
 
   <div>
     <h2>Current Events</h2>
@@ -42,7 +19,8 @@
         <tr>
           <th>Time</th>
           <th>GPIO</th>
-          <th>New State</th>
+          <!-- <th>New Digital State</th> -->
+          <th>New Analog State</th>
           <th></th>
         </tr>
       </thead>
@@ -58,7 +36,8 @@
         <tr>
           <th>Time</th>
           <th>GPIO</th>
-          <th>State</th>
+          <!-- <th>Digital State</th> -->
+          <th>Analog State</th>
           <th></th>
         </tr>
       </thead>
@@ -67,16 +46,50 @@
           <td><input id="evTime" /> sec</td>
           <td>
             <select id="evGPIO">
-              <option value="22">GPIO22</option>
-              <option value="23">GPIO23</option>
-              <option value="25">GPIO25</option>
-              <option value="26">GPIO26</option>
-              <option value="27">GPIO27</option>
+              <!-- Left -->
+              <!-- <option value="19">Thumb1</option>
+              <option value="5">Thumb2</option>
+              <option value="26">Pointer1</option>
+              <option value="13">Pointer2</option>
+              <option value="27">Middle1</option>
+              <option value="33">Middle2</option>
+              <option value="14">Ring1</option>
+              <option value="12">Ring2</option>
+              <option value="23">Little1</option>
+              <option value="22">Little2</option>
+              <option value="4">UpPalm1</option>
+              <option value="16">UpPalm2</option>
+              <option value="18">DownPalm1</option>
+              <option value="17">DownPalm2</option>
+              <option value="21">DownPalm3</option>
+              <option value="15">Back1</option>
+              <option value="25">Back2</option>
+              <option value="32">Back3</option> -->
+              <!-- Right -->
+              <option value="23">Thumb1</option>
+              <option value="22">Thumb2</option>
+              <option value="14">Pointer1</option>
+              <option value="12">Pointer2</option>
+              <option value="27">Middle1</option>
+              <option value="33">Middle2</option>
+              <option value="26">Ring1</option>
+              <option value="13">Ring2</option>
+              <option value="19">Little1</option>
+              <option value="5">Little2</option>
+              <option value="21">UpPalm1</option>
+              <option value="17">UpPalm2</option>
+              <option value="16">DownPalm1</option>
+              <option value="18">DownPalm2</option>
+              <option value="4">DownPalm3</option>
+              <option value="32">Back1</option>
+              <option value="25">Back2</option>
+              <option value="15">Back3</option>
             </select>
           </td>
-          <td>
-            <input type="checkbox" id="evState" /> HIGH
-          </td>
+          <!-- <td>
+            <input type="checkbox" id="evDigitalState" /> HIGH
+          </td> -->
+          <td><input id="evAnalogState" /> (OFF: 0, Max: 255)</td>
           <td><button type="button" class="button" onclick="addEvent(); return false;">Add</button></td>
         </tr>
       </tbody>
@@ -115,7 +128,7 @@
 
   <!-- <script src="bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script> -->
   <script src="jquery-3.3.1.min.js"></script>
-  <script src="handtrack.min.js"></script>
+  <!-- <script src="handtrack.min.js"></script> -->
   <script src="app.js"></script>
 </body>
 </html>
