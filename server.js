@@ -51,8 +51,8 @@ app.post('/api/events', (req, res) => {
     // If invalid, return 400 - Bad request
     // unpack error from the Joi validate method
     /* --- Unity can only send String instead of Int: comment out the validation --- */
-    // const { error } = validateEvents(req.body);
-    // if(error) return res.status(400).send(error.details[0].message);
+    const { error } = validateEvents(req.body);
+    if(error) return res.status(400).send(error.details[0].message);
 
     const event = {
         id: events.length,
